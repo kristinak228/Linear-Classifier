@@ -24,77 +24,72 @@ def readTestFile( file ):
 	vecTesters = []
 	for line in f:
 		vecTesters.append(line)
-	i = 0
 	return vecTesters
 
 # Classifier function to figure out my weight 'w' 
 def classifier():
 
+        # Initial stuff that does not get repeated
         trueAnswer = []
         trainList = []
         trueAnswer, trainList = readTrainingFile("train.txt") # fetching vectors
-
+#        print "trainList: ", trainList
         w = np.zeros((792, 1024)) # initially set weight to 0
-        a = 0 
+#        print "w: ", w
+        Error = True
+        errorCounter = 0
+        # Repeats until Error = false, meaning the training set effectively trained w
+        while Error == True:
+            print "-----------------TIME THROUGH: ", errorCounter
+            errorCounter += 1
+            Error = False
         
-        for (i, row) in enumerate(w): # each row for w
-            training_row = trainList[a] # each row for training 
-            b = 0  
-            yGuess = 0 
-            for (j, value) in enumerate(row): # each value for w
-                val = training_row[b] 
-                b += 1
-                yGuess += value*int(float(val)) # (j*val) + (j*val) + (j*val)...    
-                      
-            # compare trueAnswer with yGuess  
-            yHat = trueAnswer[a]
-            a += 1
-            updateW = 0
-            if yGuess >= 0: # y = +1, guess value is 1
-                sign = 1
-                if yHat != 'Y': # guess not truly above the line 
-                    updateW = 1
-            elif yGuess < 0: # y = -1, guess value is 0
-                sign = -1
-                if yHate != 'N': # guess not truly below the line
-                    updateW = 1
-            
-            # iterate to update w if incorrect guess
-            if updateW == 1:
-                print "Incorrect Guess"
-                a_ = 0
-                x_ = 0
-                fixedWeight = np.zeros((792,1024)) # taking w's place for now
-                for (i_, row_) in enumerate(w):
-                    training_r = trainList[a_]
-                    fixed_row = fixedWeight[x_]
-                    a_ += 1
-                    b_ = 0
-                    y_ = 0
-                    for (j_, value_) in enumerate(row_):
-                        val_ = training_r[b_]
-                        b_ += 1
-                        fixed_row[y_] += value_ + sign * int(float(val_)) 
-                        y_ += 1
-                    fixedWeight[x_] = fixed_row
-                    x_ += 1
-                # Update w
-                w = fixedWeight
-            elif updateW == 0:
-                print "Correct Guess"
+#            guess = np.zeros((792, 1024))
+            guess = np.dot(w, trainList)
+            # compare trueAnswer(yHat) with guess(value)  
+            for (i, value) in enumerate(guess):
+                yHat = trueAnswer[i] # only one answer per row i
+                updateW = 0
+                if value >= 0: # y = +1, guess value is 1
+                    sign = 1
+                    if yHat != 'Y': # guess not truly above the line 
+                        updateW = 1
+                elif value < 0: # y = -1, guess value is 0
+                    sign = -1
+                    if yHat != 'N': # guess not truly below the line
+                        updateW = 0
+              
+                if updateW == 1:
+                    print "Incorrect Guess"
+                    print "w before: ", w
+                    Error = True
+                    np.add(np.dot(trainList, sign), w)
+                    print "w after: ", w
+                elif updateW == 0:
+                    print "Correct Guess"
 
-            # this has to keep looping until all are correct
-            # maybe make your classifier() keep track of all the correct answers you get
-            # if you don't get any errors then return yes
-            # in another function have a loop that says like
-            # while not true
-                # keep looping
-            # now use with test data
-            # collect 0/1s, go to hex, go to ascii, TURN IN
+            # Done training, time to test
+            print "Weight has been correctly trained, now to test!"
+            vecTesters = []
+            vecTesters = readTestFile("test.txt")
+            ansVec = []
+            ansVec = np.dot(w, vecTesters)
 
-# make another function here, call in main
+            for AnsValue in ansVec: 
+                if AnsValue >= 0:
+                    binary = 1
+                    print "binary: ", binary
+                elif AnsValue < 0:
+                    binary = 0
+                    print "binary: ", binary
+                binaryVec.append(binary) # 8 total
+        
+        # print ansVec    
+        # call a hex function, ascii char 
 
+# M A I N
 def main():
+
     classifier()
 
 if __name__ == "__main__":
